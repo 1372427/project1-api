@@ -10,8 +10,8 @@
 
     const handleResponse = (xhr, parseResponse) => {
       const content = document.querySelector('#content');
-      //If there is a message, store it 
-      let message = xhr.response? `Message: ${JSON.parse(xhr.response).message}` || (xhr.response) : "";
+
+      let message = xhr.response? JSON.parse(xhr.response).message || (xhr.response) : "";
 
       switch (xhr.status) {
         case 200:
@@ -62,6 +62,8 @@
       let userAction = userForm.querySelector('#urlField').value;
       let userMethod = userForm.querySelector('#methodSelect').value;
       
+      
+
       const xhr = new XMLHttpRequest();
       xhr.open(userMethod, userAction);
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')

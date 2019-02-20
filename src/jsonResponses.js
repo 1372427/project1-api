@@ -18,6 +18,8 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+
+//GET REQUESTS
 const getUsers = (request, response) => {
   const responseJSON = {
     users
@@ -25,6 +27,33 @@ const getUsers = (request, response) => {
   return respondJSON(request, response, 200, responseJSON);
 };
 
+const getUsersMeta = (request, response) => respondJSONMeta(request, response, 200);
+
+const getSubject = (request, response) => {
+
+}
+
+const getSubjectMeta = (req, res) => {
+
+}
+
+const getStudySet = (req, res) => {
+
+} 
+
+const getStudySetMeta = (req, res) => {
+
+}
+
+const getQA = (req, res) => {
+
+}
+
+const getQAMeta = (req, res) => {
+
+}
+
+//POST REQUESTS
 const addUser = (request, response, body) => {
   const responseJSON = {
     message: 'Name and age are both required',
@@ -48,9 +77,17 @@ const addUser = (request, response, body) => {
   return respondJSONMeta(request, response, responseCode);
 };
 
+const addSubject = (request, response, body) => {
+};
 
-const getUsersMeta = (request, response) => respondJSONMeta(request, response, 200);
+const addStudySet = (request, response, body) => {
+};
 
+const addQA = (req, res, body) => {
+
+};
+
+//ERROR
 const notReal = (request, response) => {
   const responseJSON = {
     message: 'The page you are looking for was not found',
@@ -67,4 +104,13 @@ module.exports = {
   addUser,
   notReal,
   notRealMeta,
+  addSubject,
+  addStudySet,
+  addQA,
+  getSubject,
+  getStudySet,
+  getQA,
+  getSubjectMeta,
+  getStudySetMeta,
+  getQAMeta,
 };

@@ -13,7 +13,9 @@ const postUrl = {
 }
 
 const headUrl = {
-
+  '/getSubject': jsonHandler.getSubjectMeta,
+  '/getStudySet': jsonHandler.getStudySetMeta,
+  '/getQA': jsonHandler.getQAMeta,
 }
 
 const getUrl = {
@@ -59,8 +61,8 @@ const onRequest = (request, response) => {
       }
       break;
     case 'HEAD':
-      if (parsedUrl.pathname === '/getUsers') {
-        jsonHandler.getUsersMeta(request, response);
+      if (headUrl[parsedUrl.pathname]) {
+        headUrl[parsedUrl.pathname](request, response);
       } else {
         jsonHandler.notRealMeta(request, response);
       }

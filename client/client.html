@@ -6,13 +6,15 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+    let id = 'index';
 
-
-    const handleResponse = (xhr, parseResponse) => {
+    const handleResponse = (xhr, callback) => {
       const content = document.querySelector('#content');
 
       let message = xhr.response? JSON.parse(xhr.response).message || (xhr.response) : "";
+      if(callback)callback(xhr)
 
+      //TODO: REMOVE
       switch (xhr.status) {
         case 200:
           content.innerHTML = `<b>Success</b><p>${message}</p>`;
@@ -33,14 +35,51 @@
           content.innerHTML = `<b>Error Code Not Implemented By Client</b><p>Status Code: ${xhr.status}</p>`;
           break;
         }
+        content.innerHTML = "";
     };
+
+    const handleGetSubjectPg = (xhr) => {
+      let parsed = JSON.parse(xhr.response).message;
+      let body = document.querySelector("#mainBody");
+      while (body.firstChild) {
+        body.removeChild(body.firstChild);
+      }
+      for(let i = 0; i< parsed.length; i++){
+        let newChild = document.createElement('button');
+        newChild.innerHTML = `${parsed[i]}`;
+        newChild.addEventListener('click', () =>sendGet(`/getStudySet?subject=${parsed[i]}`, 'GET', handleGetStudySetPg))
+        body.append(newChild);
+      }
+    }
+
+    const refreshPage = (xhr) => {
+      if(id === 'index')
+      sendGet('/getSubject', 'GET', handleGetSubjectPg)
+    }
+
+    const handleGetStudySetPg = (xhr) => {
+      let parsed = JSON.parse(xhr.response).message;
+      let body = document.querySelector("#mainBody");
+      while (body.firstChild) {
+        body.removeChild(body.firstChild);
+      }
+      for(let i = 0; i< parsed.studySet.length; i++){
+        let newChild = document.createElement('button');
+        newChild.innerHTML = `${parsed.studySet[i]}`;
+        newChild.addEventListener('click', () =>sendGet(`/getQA?subject=${parsed.subject}&studySet=${parsed.studySet[i]}`, 'GET', handleGetQAPg))
+        body.append(newChild);
+      }
+    }
+
+    const handleGetQAPg = (xhr) => {
+      console.log(xhr);
+    }
 
     const sendPost = (e, nameForm) => {
       const nameAction = nameForm.getAttribute('action');
       const nameMethod = nameForm.getAttribute('method');
       
-      const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
+      const subjectField = nameForm.querySelector('#subjectField');
 
       const xhr = new XMLHttpRequest();
       xhr.open(nameMethod, nameAction);
@@ -48,20 +87,19 @@
       xhr.setRequestHeader('Accept', 'application/json');
 
       xhr.onload = () =>{
-        handleResponse(xhr);
+        handleResponse(xhr, refreshPage);
       }
       
-      const formData  = `name=${nameField.value}&age=${ageField.value}`;
+      const formData  = `subject=${subjectField.value}`;
       xhr.send(formData);
     
       e.preventDefault();
       return false;
     };
 
-    const sendGet = (e, userForm) => {
+    const sendGetForm = (e, userForm) => {
       let userAction = userForm.querySelector('#urlField').value;
       let userMethod = userForm.querySelector('#methodSelect').value;
-      
       
 
       const xhr = new XMLHttpRequest();
@@ -79,15 +117,26 @@
       return false;
     }
 
-    const init = () => {
-      const nameForm = document.querySelector('#nameForm');
-      const addUser = (e) => sendPost(e, nameForm);
-      nameForm.addEventListener('submit', addUser);
+    const sendGet = (url, methodType, callback) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(methodType, url);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+      xhr.setRequestHeader('Accept', 'application/json');
 
+      xhr.onload = () =>{
+        handleResponse(xhr, callback);
+      }
       
-      const userForm = document.querySelector('#userForm');
-      const getFunct = (e) => sendGet(e, userForm);
-      userForm.addEventListener('submit', getFunct);
+      xhr.send();
+      return false;
+    }
+
+    const init = () => {
+      const subjectForm = document.querySelector('#subjectForm');
+      const addSubject = (e) => sendPost(e, subjectForm);
+      subjectForm.addEventListener('submit', addSubject);
+
+      sendGet('/getSubject', 'GET', handleGetSubjectPg)
     };
 
     window.onload = init;
@@ -96,26 +145,14 @@
 <body>
   <section id="top">
     <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <input type="submit" value="Add User" />
-    </form>
-    <form id="userForm" action="/getUsers" method="get">
-      <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get User" />
+    <form id="subjectForm" action="/addSubject" method="post">
+      <label for="subject">Subject: </label>
+      <input id="subjectField" type="text" name="subject" />
+      <input type="submit" value="Add Subject" />
     </form>
   </section>
   <section id="content">
   </section>
+  <div id="mainBody"></div>
 </body>
 </html>

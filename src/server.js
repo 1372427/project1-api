@@ -9,22 +9,23 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const postUrl = {
   '/addSubject': jsonHandler.addSubject,
   '/addStudySet': jsonHandler.addStudySet,
-  '/addQA': jsonHandler.addQA
-}
+  '/addQA': jsonHandler.addQA,
+};
 
 const headUrl = {
   '/getSubject': jsonHandler.getSubjectMeta,
   '/getStudySet': jsonHandler.getStudySetMeta,
   '/getQA': jsonHandler.getQAMeta,
-}
+};
 
 const getUrl = {
   '/getSubject': jsonHandler.getSubject,
   '/getStudySet': jsonHandler.getStudySet,
   '/getQA': jsonHandler.getQA,
   '/index': htmlHandler.getIndex,
-  '/style.css': htmlHandler.getStyle
-}
+  '/': htmlHandler.getIndex,
+  '/style.css': htmlHandler.getCSS,
+};
 
 const handlePost = (request, response, parsedUrl) => {
   if (postUrl[parsedUrl.pathname]) {
@@ -52,11 +53,14 @@ const handlePost = (request, response, parsedUrl) => {
 
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
+  const params = query.parse(parsedUrl.query);
+
   switch (request.method) {
     case 'GET':
-      if (getUrl.contains(parsedUrl.pathname)) {
-        getUrl[parsedUrl.pathname](request, response);
-      }else {
+      console.log(params);
+      if (getUrl[parsedUrl.pathname]) {
+        getUrl[parsedUrl.pathname](request, response, params);
+      } else {
         jsonHandler.notReal(request, response);
       }
       break;

@@ -94,7 +94,8 @@ const getQA = (request, response, params) => {
     respondJSON(request, response, 400, responseJSON);
   }
 
-  responseJSON.message = {subject: params.subject, studySet: params.studySet, qa: data[params.subject][params.studySet] };
+  responseJSON.message = {subject: params.subject, 
+    studySet: params.studySet, qa: data[params.subject][params.studySet] };
   return respondJSON(request, response, 200, responseJSON);
 };
 
@@ -174,6 +175,7 @@ const addStudySet = (request, response, body) => {
 
 const addQA = (request, response, body) => {
 // TODO - FIX ME!!!
+let bodId = body.id;
   const responseJSON = {
     message: 'Subject name and study set name is required',
   };
@@ -183,12 +185,12 @@ const addQA = (request, response, body) => {
   }
   let responseCode = 201; // created response code
   if (data[body.subject] && data[body.subject][body.studySet]){
-    if( !body.id) {
-      body.id = Object.keys(data[body.subject][body.studySet]).length;
-    } else if (data[body.subject][body.studySet][body.id]) {
+    if( !bodId) {
+      bodId = Object.keys(data[body.subject][body.studySet]).length;
+    } else if (data[body.subject][body.studySet][bodId]) {
       responseCode = 204; // updated response code
     }
-    data[body.subject][body.studySet][body.id] = { q: body.q, a: body.a };
+    data[body.subject][body.studySet][bodId] = { q: body.q, a: body.a };
   }else {
     //bad request
     console.log('bad');

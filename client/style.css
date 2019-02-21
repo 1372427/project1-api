@@ -19,3 +19,7 @@ html, body {
   font-size: 2em;
   text-align: center;
 }
+
+.hide {
+  display: none
+}

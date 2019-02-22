@@ -174,6 +174,7 @@ const addStudySet = (request, response, body) => {
 };
 
 const addQA = (request, response, body) => {
+  console.log(body);
 // TODO - FIX ME!!!
 let bodId = body.id;
   const responseJSON = {

@@ -9,10 +9,12 @@
     let id = 'index';
 
     const handleResponse = (xhr, callback) => {
+      if(callback)callback(xhr)
+      /*
       const content = document.querySelector('#content');
 
       let message = xhr.response? JSON.parse(xhr.response).message || (xhr.response) : "";
-      if(callback)callback(xhr)
+     
 
       //TODO: REMOVE
       switch (xhr.status) {
@@ -36,9 +38,11 @@
           break;
         }
         content.innerHTML = "";
+        */
     };
 
     const handleGetSubjectPg = (xhr) => {
+      id = 'index';
       let parsed = JSON.parse(xhr.response).message;
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
@@ -54,11 +58,18 @@
 
     const refreshPage = (xhr) => {
       if(id === 'index')
-      sendGet('/getSubject', 'GET', handleGetSubjectPg)
+        sendGet('/getSubject', 'GET', handleGetSubjectPg);
+      let parsed = id.split('-');
+      if(parsed.length === 2){
+        sendGet(`/getStudySet?subject=${parsed[1]}`, 'GET', handleGetStudySetPg);
+      } if(parsed.length === 4){
+        sendGet(`/getQA?subject=${parsed[1]}&studySet=${parsed[3]}`, 'GET', handleGetStudySetPg);
+      }
     }
 
     const handleGetStudySetPg = (xhr) => {
       let parsed = JSON.parse(xhr.response).message;
+      id = `subject-${parsed.subject}`;
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
@@ -74,8 +85,8 @@
     }
 
     const handleGetQAPg = (xhr) => {
-      console.log(xhr);
       let parsed = JSON.parse(xhr.response).message;
+      id = `subject-${parsed.subject}-studySet-${parsed.studySet}`
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
@@ -126,8 +137,8 @@
       xhr.onload = () =>{
         handleResponse(xhr, refreshPage);
       }
-      
-      const formData  = `subject=${subjectField.value}&studySet=${studySetField.value}`;
+      let subj = id.split('-')[1];
+      const formData  = `subject=${subj}&studySet=${studySetField.value}`;
       xhr.send(formData);
     
       e.preventDefault();
@@ -153,7 +164,8 @@
         handleResponse(xhr, refreshPage);
       }
       
-      const formData  = `subject=${subjectField.value}&studySet=${studySetField.value}&q=${qField.value}&a=${aField.value}`;
+      let parsed = id.split('-');
+      const formData  = `subject=${parsed[1]}&studySet=${parsed[3]}&q=${qField.value}&a=${aField.value}`;
       xhr.send(formData);
     
       e.preventDefault();
@@ -226,21 +238,12 @@
     </form>
 
     <form id="studySetForm"  class="hide" action="/addStudySet" method="post">
-      <label for="subject">Subject: </label>
-      <input id="subjectField" type="text" name="subject" />
-      
       <label for="studySet">Study Set: </label>
       <input id="studySetField" type="text" name="studySet" />
       <input type="submit" value="Add Study Set" />
     </form>
 
     <form id="qaForm" class="hide" action="/addQA" method="post">
-      <label for="subject">Subject: </label>
-      <input id="subjectField" type="text" name="subject" />
-      
-      <label for="studySet">Study Set: </label>
-      <input id="studySetField" type="text" name="studySet" />
-
 
       <label for="q">Question: </label>
       <input id="qField" type="text" name="q" />
@@ -249,8 +252,6 @@
       <input id="aField" type="text" name="a" />
       <input type="submit" value="Add Question" />
     </form>
-  </section>
-  <section id="content">
   </section>
   <div id="mainBody"></div>
 </body>

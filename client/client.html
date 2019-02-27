@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Our simple HTTP server</title>
+  <title>Simple Study Assistant</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
     let id = 'index';
+    let add = false;
 
     const handleResponse = (xhr, callback) => {
-      if(callback)callback(xhr)
+      console.log(window.history)
+      add=true;
+      if(callback)callback(xhr);
+
       /*
       const content = document.querySelector('#content');
 
@@ -43,6 +47,9 @@
 
     const handleGetSubjectPg = (xhr) => {
       id = 'index';
+      if(add){
+        history.pushState({}, "title", '/getSubject');
+      }
       let parsed = JSON.parse(xhr.response).message;
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
@@ -54,22 +61,31 @@
         newChild.addEventListener('click', () =>sendGet(`/getStudySet?subject=${parsed[i]}`, 'GET', handleGetStudySetPg))
         body.append(newChild);
       }
+
+      
+      document.querySelector("#subjectForm").classList.remove("hide");
+      document.querySelector("#studySetForm").classList.add("hide");
+      document.querySelector("#qaForm").classList.add("hide");
     }
 
     const refreshPage = (xhr) => {
+      add=false;
       if(id === 'index')
         sendGet('/getSubject', 'GET', handleGetSubjectPg);
       let parsed = id.split('-');
       if(parsed.length === 2){
         sendGet(`/getStudySet?subject=${parsed[1]}`, 'GET', handleGetStudySetPg);
       } if(parsed.length === 4){
-        sendGet(`/getQA?subject=${parsed[1]}&studySet=${parsed[3]}`, 'GET', handleGetStudySetPg);
+        sendGet(`/getQA?subject=${parsed[1]}&studySet=${parsed[3]}`, 'GET', handleGetQAPg);
       }
     }
 
     const handleGetStudySetPg = (xhr) => {
       let parsed = JSON.parse(xhr.response).message;
       id = `subject-${parsed.subject}`;
+      if(add){
+        history.pushState({}, "title", `/getStudySet?subject=${parsed.subject}`);
+      }
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
@@ -82,11 +98,17 @@
       }
 
       document.querySelector("#studySetForm").classList.remove("hide");
+      document.querySelector("#subjectForm").classList.add("hide");
+      document.querySelector("#qaForm").classList.add("hide");
     }
 
     const handleGetQAPg = (xhr) => {
       let parsed = JSON.parse(xhr.response).message;
-      id = `subject-${parsed.subject}-studySet-${parsed.studySet}`
+        id = `subject-${parsed.subject}-studySet-${parsed.studySet}`
+      if(add){
+      history.pushState({}, "title", `/getQA?subject=${parsed.subject}&studySet=${parsed.studySet}`);
+      }
+
       let body = document.querySelector("#mainBody");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
@@ -98,6 +120,8 @@
       }
       
       document.querySelector("#qaForm").classList.remove("hide");
+      document.querySelector("#studySetForm").classList.add("hide");
+      document.querySelector("#subjectForm").classList.add("hide");
     }
 
     const sendSubjectPost = (e, nameForm) => {
@@ -150,8 +174,6 @@
       const nameAction = nameForm.getAttribute('action');
       const nameMethod = nameForm.getAttribute('method');
       
-      const subjectField = nameForm.querySelector('#subjectField');
-      const studySetField = nameForm.querySelector('#studySetField');
       const qField = nameForm.querySelector('#qField');
       const aField = nameForm.querySelector('#aField');
 
@@ -208,6 +230,19 @@
     }
 
     const init = () => {
+
+    window.onpopstate = (e) =>{ 
+      sendGet(document.location, 'get', (xhr) => {
+      add=false;
+      if(document.location.href.includes('getSubject'))
+        handleGetSubjectPg(xhr)
+      else if (document.location.href.includes('getStudySet'))
+        handleGetStudySetPg(xhr)
+      else if (document.location.href.includes('getQA'))
+        handleGetQAPg(xhr)
+
+    })};
+
       const subjectForm = document.querySelector('#subjectForm');
       const addSubject = (e) => sendSubjectPost(e, subjectForm);
       subjectForm.addEventListener('submit', addSubject);
@@ -222,15 +257,16 @@
       const addQA = (e) => sendQAPost(e, qaForm);
       qaForm.addEventListener('submit', addQA);
 
-      sendGet('/getSubject', 'GET', handleGetSubjectPg)
+      sendGet('/getSubject', 'GET', handleGetSubjectPg);
     };
 
     window.onload = init;
   </script>
 </head>
 <body>
+  <div id="content">
   <section id="top">
-    <h3>POST Status Code Tests</h3>
+    <h3>Studler</h3>
     <form id="subjectForm" action="/addSubject" method="post">
       <label for="subject">Subject: </label>
       <input id="subjectField" type="text" name="subject" />
@@ -254,5 +290,6 @@
     </form>
   </section>
   <div id="mainBody"></div>
+</div>
 </body>
 </html>

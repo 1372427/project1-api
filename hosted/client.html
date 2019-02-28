@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Simple Study Assistant</title>
+  <link href="https://fonts.googleapis.com/css?family=Dosis:700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat+Alternates" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+  <script src="/bundle.js"></script>
+</head>
+<body>
+  <h3>Studler</h3>
+  <div id="content">
+  <section id="top">
+
+    <form id="subjectForm" action="/addSubject" method="post">
+      <label for="subject">Subject: </label>
+      <input id="subjectField" type="text" name="subject" />
+      <input type="submit" value="Add Subject" />
+    </form>
+
+    <form id="studySetForm"  class="hide" action="/addStudySet" method="post">
+      <label for="studySet">Study Set: </label>
+      <input id="studySetField" type="text" name="studySet" />
+      <input type="submit" value="Add Study Set" />
+    </form>
+
+    <form id="qaForm" class="hide" action="/addQA" method="post">
+      <label for="q">Question: </label>
+      <input id="qField" type="text" name="q" />
+      
+      <label for="a">Answer: </label>
+      <input id="aField" type="text" name="a" />
+      <input type="submit" value="Add Question" />
+    </form>
+
+  </section>
+  <div id="mainBody"></div>
+</div>
+</body>
+</html>

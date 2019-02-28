@@ -17,10 +17,33 @@ const data = {
         q: 'Current President of the US',
         a: 'Trump',
       },
+      1:
+      {
+        q: '35th US President. Was Assassinated',
+        a: 'Kennedy',
+      },
+      2:
+      {
+        q: 'Civil rights leader advocating non-violent civil disobedience. Had a dream',
+        a: 'Martin Luther King Jr.',
+      },
+      3:
+      {
+        q: 'Sat on a bus',
+        a: 'Rosa Parks',
+      },
     },
   },
   Japanese: {
-
+    Greetings: {
+      0: {
+        q: 'Said in the evening',
+        a: 'こんばんは',
+      },
+      1: {
+        q: "To ask after one's well being",
+        a: 'おげんき です か',
+      } },
   },
 };
 
@@ -94,8 +117,9 @@ const getQA = (request, response, params) => {
     respondJSON(request, response, 400, responseJSON);
   }
 
-  responseJSON.message = {subject: params.subject, 
-    studySet: params.studySet, qa: data[params.subject][params.studySet] };
+  responseJSON.message = { subject: params.subject,
+    studySet: params.studySet,
+    qa: data[params.subject][params.studySet] };
   return respondJSON(request, response, 200, responseJSON);
 };
 
@@ -174,30 +198,28 @@ const addStudySet = (request, response, body) => {
 };
 
 const addQA = (request, response, body) => {
-  console.log(body);
-// TODO - FIX ME!!!
-let bodId = body.id;
+  // TODO - FIX ME!!!
+  let bodId = body.id;
   const responseJSON = {
     message: 'Subject name and study set name is required',
   };
-  if (!body.subject || !body.studySet || !body.q || !body.a ) {
+  if (!body.subject || !body.studySet || !body.q || !body.a) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
   let responseCode = 201; // created response code
-  if (data[body.subject] && data[body.subject][body.studySet]){
-    if( !bodId) {
+  if (data[body.subject] && data[body.subject][body.studySet]) {
+    if (!bodId) {
       bodId = Object.keys(data[body.subject][body.studySet]).length;
     } else if (data[body.subject][body.studySet][bodId]) {
       responseCode = 204; // updated response code
     }
     data[body.subject][body.studySet][bodId] = { q: body.q, a: body.a };
-  }else {
-    //bad request
-    console.log('bad');
+  } else {
+    // bad request
   }
 
-        
+
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
     return respondJSON(request, response, responseCode, responseJSON);

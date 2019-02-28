@@ -25,6 +25,9 @@ const getUrl = {
   '/index': htmlHandler.getIndex,
   '/': htmlHandler.getIndex,
   '/style.css': htmlHandler.getCSS,
+  '/bundle.js': htmlHandler.getBundle,
+  '/client/main.js': htmlHandler.getMain,
+  '/client/forms.js': htmlHandler.getForms,
 };
 
 const handlePost = (request, response, parsedUrl) => {
@@ -57,7 +60,6 @@ const onRequest = (request, response) => {
 
   switch (request.method) {
     case 'GET':
-      console.log(params);
       if (getUrl[parsedUrl.pathname]) {
         getUrl[parsedUrl.pathname](request, response, params);
       } else {

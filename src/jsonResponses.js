@@ -113,7 +113,8 @@ const getQA = (request, response, params) => {
   };
 
   // check for params subject and studySet (existing and valid)
-  if (!params.subject || !params.studySet || !data[params.subject] || !data[params.subject][params.studySet]) {
+  if (!params.subject || !params.studySet || !data[params.subject]
+       || !data[params.subject][params.studySet]) {
     responseJSON.id = 'badRequest';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -125,10 +126,12 @@ const getQA = (request, response, params) => {
   return respondJSON(request, response, 200, responseJSON);
 };
 
-//return the head response for a request on the questions and answers of a given study set and subject
+//return the head response for a request on the questions and
+// answers of a given study set and subject
 const getQAMeta = (request, response, params) => {
   //check if params exist and are valid
-  if (!params.subject || !params.studySet || !data[params.subject] || !data[params.subject][params.studySet]) {
+  if (!params.subject || !params.studySet || !data[params.subject]
+     || !data[params.subject][params.studySet]) {
     return respondJSONMeta(request, response, 400);
   }
   return respondJSONMeta(request, response, 200);

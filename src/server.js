@@ -6,6 +6,7 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
+//set up redirects
 const postUrl = {
   '/addSubject': jsonHandler.addSubject,
   '/addStudySet': jsonHandler.addStudySet,
@@ -26,25 +27,28 @@ const getUrl = {
   '/': htmlHandler.getIndex,
   '/style.css': htmlHandler.getCSS,
   '/bundle.js': htmlHandler.getBundle,
-  '/client/main.js': htmlHandler.getMain,
-  '/client/forms.js': htmlHandler.getForms,
+  '/documentation.html': htmlHandler.getDoc,
 };
 
+//handles post requests, waiting for all data
 const handlePost = (request, response, parsedUrl) => {
+  //check if a valid request
   if (postUrl[parsedUrl.pathname]) {
     const body = [];
 
+    //alert on error
     request.on('error', (err) => {
       console.dir(err);
       response.statusCode = 400;
       response.end();
     });
 
+    //wait for all data
     request.on('data', (chunk) => {
       body.push(chunk);
     });
 
-
+    //format data and send to proper handler method
     request.on('end', () => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
@@ -54,10 +58,12 @@ const handlePost = (request, response, parsedUrl) => {
   }
 };
 
+//handles all incoming requests
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
   const params = query.parse(parsedUrl.query);
 
+  //send to correct handler method based on type of request
   switch (request.method) {
     case 'GET':
       if (getUrl[parsedUrl.pathname]) {

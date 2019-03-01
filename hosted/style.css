@@ -56,19 +56,28 @@ button {
   font-size: 1.5em;
 }
 
-
-h3{
-  background-color: #821313;
-  margin: 0;
-  padding: 2%;
-  color: white;
-  font-size: 2em;
-}
-
-h1, h2 {
+h1, h2, h3 {
   text-align: left;
 }
 
 h2{
   margin-left: 20px;
+}
+
+h3{
+  margin-left: 40px;
+}
+
+#header{
+  background-color: #821313;
+  margin: 0;
+  padding: 2%;
+  color: white;
+  font-size: 2em;
+  text-align: center;
+}
+
+.leftAdj {
+  text-align: left;
+  margin-left: 60px;
 }
